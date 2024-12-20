@@ -18,6 +18,7 @@ from .base import CommonModel, BaseModel
 
 """ACCOUNT MODELS"""
 
+
 class User(AbstractUser, BaseModel):
     phone = models.CharField(max_length=100, unique=True)
     newsletter = models.BooleanField(default=False)
@@ -117,6 +118,7 @@ class OTP(models.Model):
 
 """INVENTORY MODELS"""
 
+
 class Offer(BaseModel):
     name = models.CharField(max_length=100)
     discount = models.DecimalField(
@@ -161,12 +163,6 @@ class Product(BaseModel):
     is_saleable = models.BooleanField(default=True)
     requires_prescription = models.BooleanField(default=False)
     stock_level = models.IntegerField(default=0)
-    last_modified_date = models.DateTimeField(null=True, blank=True)
-    created_date = models.DateTimeField(null=True, blank=True)
-    hscode = models.CharField(max_length=100, null=True, blank=True)
-    hstype = models.CharField(max_length=100, null=True, blank=True)
-    hsdescription = models.TextField(null=True, blank=True)
-    datapool_id = models.CharField(max_length=100, null=True, blank=True)
     stores = models.ManyToManyField(
         Store, blank=True, through="inventory.StoreProduct", related_name="products"
     )
@@ -188,10 +184,6 @@ class Product(BaseModel):
             "slug",
             "created_at",
             "updated_at",
-            "datapool_id",
-            "hscode",
-            "hstype",
-            "hsdescription",
         ]
 
 
@@ -219,6 +211,16 @@ class FavoriteProduct(BaseModel):
 
 
 """PAYMENT MODELS"""
+
+
+class Customer(BaseModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    address = models.CharField(max_length=100, null=True, blank=True)
+    latitude = models.CharField(max_length=100, null=True, blank=True)
+    longitude = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.name
 
 
 class Coupon(BaseModel):
@@ -277,6 +279,7 @@ class Order(BaseModel):
         Product, through="payments.OrderProduct", related_name="orders"
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     order_status = models.CharField(choices=ORDER_STATUS, default="pending")
     delivery_method = models.CharField(
         max_length=100, choices=DELIVERY_METHODS, default="delivery"
@@ -415,8 +418,8 @@ class PaymentMethod(BaseModel):
         return self.name
 
 
-
 """UICOPY MODELS"""
+
 
 class Text(BaseModel):
     content = models.TextField(null=True, blank=True)
@@ -550,6 +553,7 @@ class SectionData(BaseModel):
 
 
 """COMMON MODELS"""
+
 
 class Setting(BaseModel):
     name = models.CharField()
