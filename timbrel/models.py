@@ -276,7 +276,9 @@ class Order(BaseModel):
         Product, through="timbrel.OrderProduct", related_name="orders"
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.CASCADE, null=True, blank=True
+    )
     order_status = models.CharField(choices=ORDER_STATUS, default="pending")
     delivery_method = models.CharField(
         max_length=100, choices=DELIVERY_METHODS, default="delivery"
