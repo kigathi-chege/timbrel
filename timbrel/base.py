@@ -4,9 +4,7 @@ import inflect
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
-from rest_framework import viewsets, serializers
-from django.urls import reverse
-from simple_history.models import HistoricalRecords
+from django.urls.exceptions import NoReverseMatch
 from django.db.models.fields.related import ManyToManyField
 from django.db.models import (
     ForeignKey,
@@ -18,6 +16,8 @@ from django.db.models import (
 )
 from django.core.exceptions import FieldDoesNotExist
 from django.conf import settings
+from rest_framework import viewsets, serializers
+from simple_history.models import HistoricalRecords
 
 p = inflect.engine()
 
@@ -35,7 +35,10 @@ class CommonModel(models.Model):
 
     def get_absolute_url(self):
         model_name = self.__class__.__name__.lower()
-        return reverse(f"{model_name}-detail", args=[str(self.id)])
+        try:
+            return reverse(f"{model_name}-detail", args=[str(self.id)])
+        except NoReverseMatch:
+            return reverse(f"timbrel-{model_name}-detail", args=[str(self.id)])
 
     def get_relative_url(self):
         absolute_url = self.get_absolute_url()
