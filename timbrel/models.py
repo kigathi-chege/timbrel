@@ -159,7 +159,6 @@ class Product(BaseModel):
     price = models.FloatField(default=0)
     sku = models.CharField(max_length=100, null=True, blank=True)
     is_saleable = models.BooleanField(default=True)
-    requires_prescription = models.BooleanField(default=False)
     stock_level = models.IntegerField(default=0)
     stores = models.ManyToManyField(
         Store, blank=True, through="inventory.StoreProduct", related_name="products"
