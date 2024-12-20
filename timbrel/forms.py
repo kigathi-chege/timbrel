@@ -95,7 +95,7 @@ class FileAdminForm(BaseForm):
             else None
         )
 
-        reverse_url = reverse("file-view", args=[self.instance.id])
+        reverse_url = reverse("timbrel-file-view", args=[self.instance.id])
         file_url = settings.APP_URL + reverse_url
 
         self.instance.path = file_path

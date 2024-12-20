@@ -25,10 +25,29 @@ from .models import Order, OrderProduct, Transaction, PaymentMethod, Coupon
 from .tasks import send_sms
 from .base import BaseSerializer
 from .utils import get_serializer_dict, generate_random_string
-from .models import Tag, File, Advertisement, Article, Facet, FacetValue, Page, Section, Text, Button, Image, Data, User, OTP, Store, Product, FavoriteProduct
+from .models import (
+    Tag,
+    File,
+    Advertisement,
+    Article,
+    Facet,
+    FacetValue,
+    Page,
+    Section,
+    Text,
+    Button,
+    Image,
+    Data,
+    User,
+    OTP,
+    Store,
+    Product,
+    FavoriteProduct,
+)
 
 
 """ACCOUNT SERIALIZER"""
+
 
 class TokenObtainPairSerializer(TokenObtainSerializer):
     token_class = RefreshToken
@@ -134,6 +153,7 @@ class PermissionSerializer(BaseSerializer):
 
 """INVENTORY SERIALIZER"""
 
+
 class StoreSerializer(BaseSerializer):
     class Meta:
         model = Store
@@ -162,6 +182,7 @@ class ProductSerializer(BaseSerializer):
 
 
 """PAYMENT SERIALIZER"""
+
 
 class CouponSerializer(BaseSerializer):
     class Meta:
@@ -273,8 +294,8 @@ class PaymentMethodSerializer(BaseSerializer):
         fields = "__all__"
 
 
-
 """COMMON SERIALIZER"""
+
 
 class TagSerializer(BaseSerializer):
     class Meta:
@@ -335,7 +356,7 @@ class FileSerializer(BaseSerializer):
         }
 
         file = File.objects.create(**file_data)
-        file.url = settings.APP_URL + reverse("file-view", args=[file.id])
+        file.url = settings.APP_URL + reverse("timbrel-file-view", args=[file.id])
         return file
 
     class Meta:
