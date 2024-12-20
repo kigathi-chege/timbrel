@@ -65,7 +65,7 @@ def include_routers(exclude_apps=[]):
             app_urls = importlib.import_module(f"{app}.urls")
             if hasattr(app_urls, "router"):
                 router_urls.append(
-                    path(f"{get_route_prefix(app)}/", include(app_urls.router.urls))
+                    path(f"{get_route_prefix(app)}", include(app_urls.router.urls))
                 )
         except ModuleNotFoundError:
             pass
