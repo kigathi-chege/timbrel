@@ -13,12 +13,15 @@ from django.contrib.auth.models import Group, Permission
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly, IsAuthenticated
+from rest_framework.permissions import (
+    DjangoModelPermissionsOrAnonReadOnly,
+    IsAuthenticated,
+)
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import OrderFilter
-from .models import Order, Transaction, PaymentMethod, Coupon
+from .models import Order, Transaction, PaymentMethod, Coupon, FavoriteProduct
 from .tasks import calculate_popular_products
 
 from .permissions import IsNotAuthenticated, IsOwnerOnly
@@ -34,20 +37,35 @@ from .serializers import (
     DataSerializer,
     SectionSerializer,
     PageSerializer,
-    UserSerializer, 
-    GroupSerializer, 
-    PermissionSerializer, 
-    StoreSerializer, 
+    UserSerializer,
+    GroupSerializer,
+    PermissionSerializer,
+    StoreSerializer,
     ProductSerializer,
     OrderSerializer,
     TransactionSerializer,
     PaymentMethodSerializer,
     CouponSerializer,
 )
-from .models import Tag, File, Advertisement, Article, Facet, FacetValue, Text, Data, Section, Page, User, Store, Product
+from .models import (
+    Tag,
+    File,
+    Advertisement,
+    Article,
+    Facet,
+    FacetValue,
+    Text,
+    Data,
+    Section,
+    Page,
+    User,
+    Store,
+    Product,
+)
 from .filters import AdvertisementFilter, ProductFilter
 
 """ACCOUNT VIEWS"""
+
 
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated(),)
@@ -123,6 +141,7 @@ class PermissionViewSet(BaseViewSet):
 
 """INVENTORY VIEWS"""
 
+
 class StoreViewSet(BaseViewSet):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
@@ -163,6 +182,7 @@ class ProductViewSet(BaseViewSet):
 
 
 """PAYMENT VIEWS"""
+
 
 class MpesaCallbackView(APIView):
     permission_classes = (permissions.AllowAny(),)
@@ -265,8 +285,8 @@ class PaymentMethodViewSet(BaseViewSet):
     serializer_class = PaymentMethodSerializer
 
 
-
 """COMMON VIEWS"""
+
 
 class TagViewSet(BaseViewSet):
     queryset = Tag.objects.all()
