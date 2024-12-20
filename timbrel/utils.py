@@ -4,12 +4,14 @@ import string
 import inflect
 import base64
 import requests
+import importlib
 from datetime import datetime
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import ForeignKey, OneToOneField, ManyToManyField
+from django.urls import path, include
 from django.conf import settings
-from rest_framework import viewsets, serializers
+from rest_framework import viewsets, serializers, routers
 from base64 import b64encode
 
 p = inflect.engine()
@@ -37,6 +39,28 @@ def register_viewsets(router, app_name):
     except ModuleNotFoundError:
         pass
 
+
+def register_routers(exclude_apps = []):
+    basic_urls = []
+    included_apps = [item for item in settings.MY_APPS if item not in exclude_apps]
+    for app in included_apps:
+        router = routers.DefaultRouter()
+        register_viewsets(router, app)
+        basic_urls.append(path(f"{app}/", include(router.urls)))
+    return basic_urls
+
+
+def include_routers():
+    """Dynamically import routers from each installed app."""
+    router_urls = register_routers()
+    for app in settings.MY_APPS:
+        try:
+            app_urls = importlib.import_module(f"{app}.urls")
+            if hasattr(app_urls, "router"):
+                router_urls.append(path(f"{app}/", include(app_urls.router.urls)))
+        except ModuleNotFoundError:
+            pass
+    return router_urls
 
 def get_serializer_dict():
     serializer_dict = {}
