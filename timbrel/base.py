@@ -110,9 +110,9 @@ class CommonModel(models.Model):
 
 
 class BaseModel(CommonModel):
-    tags = models.ManyToManyField("common.Tag", blank=True)
-    facetvalues = models.ManyToManyField("common.FacetValue", blank=True)
-    files = models.ManyToManyField("common.File", blank=True)
+    tags = models.ManyToManyField("timbrel.Tag", blank=True)
+    facetvalues = models.ManyToManyField("timbrel.FacetValue", blank=True)
+    files = models.ManyToManyField("timbrel.File", blank=True)
     history = HistoricalRecords(inherit=True)
 
     class Meta:

@@ -566,7 +566,7 @@ class Tag(BaseModel):
 
 class Facet(CommonModel):
     name = models.CharField(unique=True)
-    tags = models.ManyToManyField("common.Tag", blank=True)
+    tags = models.ManyToManyField("timbrel.Tag", blank=True)
     history = HistoricalRecords(inherit=True)
 
     def __str__(self):
@@ -578,7 +578,7 @@ class FacetValue(CommonModel):
     facet = models.ForeignKey(
         Facet, on_delete=models.CASCADE, related_name="facetvalues"
     )
-    tags = models.ManyToManyField("common.Tag", blank=True)
+    tags = models.ManyToManyField("timbrel.Tag", blank=True)
     history = HistoricalRecords(inherit=True)
 
     def __str__(self):

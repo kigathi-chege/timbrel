@@ -9,7 +9,7 @@ from .utils import register_viewsets
 
 router = routers.DefaultRouter()
 
-register_viewsets(router, "common")
+register_viewsets(router, "timbrel")
 
 router.register(r"cities", CityModelViewSet, basename="cities-light-api-city")
 router.register(
