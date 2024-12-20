@@ -357,6 +357,7 @@ class FileSerializer(BaseSerializer):
 
         file = File.objects.create(**file_data)
         file.url = settings.APP_URL + reverse("timbrel-file-view", args=[file.id])
+        file.save()
         return file
 
     class Meta:
