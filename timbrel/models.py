@@ -141,7 +141,6 @@ class Store(BaseModel):
     email = models.CharField(max_length=100, blank=True, null=True)
     longitude = models.CharField(max_length=100, blank=True, null=True)
     latitude = models.CharField(max_length=100, blank=True, null=True)
-    datapool_id = models.CharField(null=True, blank=True)
     users = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
@@ -152,7 +151,6 @@ class Store(BaseModel):
             "slug",
             "created_at",
             "updated_at",
-            "datapool_id",
         ]
 
 
