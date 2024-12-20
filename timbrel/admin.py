@@ -29,9 +29,36 @@ from unfold.contrib.import_export.forms import (
 from .models import Order, Transaction, Coupon
 from .inlines import OrderProductsInline
 
-from .models import Setting, Tag, File, Facet, FacetValue, Advertisement, Article, Page, Section, Text, Button, Image, User, Product, Store, Offer
+from .models import (
+    Setting,
+    Tag,
+    File,
+    Facet,
+    FacetValue,
+    Advertisement,
+    Article,
+    Page,
+    Section,
+    Text,
+    Button,
+    Image,
+    User,
+    Product,
+    Store,
+    Offer,
+)
 from .forms import FileAdminForm, EditFileAdminForm
-from .inlines import FileInline, TagInline, FacetValueInline, PageSectionInline, TextInline, ImageInline, ButtonInline, SectionSectionInline, create_dynamic_inline
+from .inlines import (
+    FileInline,
+    TagInline,
+    FacetValueInline,
+    PageSectionInline,
+    TextInline,
+    ImageInline,
+    ButtonInline,
+    SectionSectionInline,
+    create_dynamic_inline,
+)
 
 
 class BaseAdmin(ModelAdmin, SimpleHistoryAdmin, ImportExportModelAdmin):
@@ -75,6 +102,7 @@ class BaseAdmin(ModelAdmin, SimpleHistoryAdmin, ImportExportModelAdmin):
             self.inlines = self.custom_inlines + self.inlines
 
     pass
+
 
 """ACCOUNT ADMIN"""
 
@@ -121,12 +149,13 @@ class GroupAdmin(BaseGroupAdmin, ModelAdmin):
 
 """INVENTORY ADMIN"""
 
+
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
     fields = (
         ("name", "price"),
         ("sku", "stock_level"),
-        ("is_saleable", "requires_prescription"),
+        "is_saleable",
         "url",
         "offer",
         "description",
@@ -177,6 +206,7 @@ class OfferAdmin(ModelAdmin):
 
 """PAYMENT MODEL"""
 
+
 @admin.register(Order)
 class OrderAdmin(ModelAdmin):
     fieldsets = [
@@ -209,13 +239,12 @@ class OrderAdmin(ModelAdmin):
                     "coupon",
                     "coupon_applied",
                     ("promotional_discount", "custom_discount"),
-                    "prescription",
                 ),
                 "classes": ["tab"],
             },
         ),
     ]
-    readonly_fields = ["user", "reference", "total_amount", "prescription"]
+    readonly_fields = ["user", "reference", "total_amount"]
     list_display = ("user", "reference", "created_at", "total_amount", "order_status")
     search_fields = ["reference"]
     custom_inlines = [OrderProductsInline]
@@ -278,8 +307,8 @@ class CouponAdmin(ModelAdmin):
     filter_horizontal = ("tags", "files", "facetvalues")
 
 
-
 """COMMON ADMIN"""
+
 
 @admin.register(Setting)
 class SettingAdmin(BaseAdmin):
