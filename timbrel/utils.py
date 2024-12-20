@@ -34,7 +34,13 @@ def register_viewsets(router, app_name):
                 viewset_name_lower = viewset_name.lower()
                 base_name = viewset_name_lower.replace("viewset", "")
                 url_name = p.plural(base_name)
-                router.register(rf"{url_name}", obj, basename=f"timbrel-{base_name}")
+
+                if obj.__module__.startswith("timbrel"):
+                    basename = f"timbrel-{base_name}"
+                else:
+                    basename = base_name
+
+                router.register(rf"{url_name}", obj, basename=basename)
 
     except ModuleNotFoundError:
         pass

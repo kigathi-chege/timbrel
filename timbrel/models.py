@@ -161,7 +161,7 @@ class Product(BaseModel):
     is_saleable = models.BooleanField(default=True)
     stock_level = models.IntegerField(default=0)
     stores = models.ManyToManyField(
-        Store, blank=True, through="inventory.StoreProduct", related_name="products"
+        Store, blank=True, through="timbrel.StoreProduct", related_name="products"
     )
     offer = models.ForeignKey(Offer, on_delete=models.SET_NULL, null=True, blank=True)
 
