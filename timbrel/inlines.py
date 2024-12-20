@@ -6,6 +6,7 @@ from .models import Page, Section, Order
 
 """PAYMENT INLINE"""
 
+
 class OrderProductsInline(TabularInline):
     model = Order.products.through
     tab = True
@@ -17,8 +18,8 @@ class OrderProductsInline(TabularInline):
     ordering = ["-created_at"]
 
 
-
 """COMMON INLINE"""
+
 
 class FileInline(TabularInline):
     verbose_name = "file"
@@ -42,7 +43,8 @@ class FileInline(TabularInline):
         if hasattr(obj, "file") and obj.file:
             mime_type = obj.file.mimetype
 
-            if mime_type and mime_type.startswith("image"):
+            # TODO: Kigathi - December 19 2024 - Without mimetype assumes that the file is an image
+            if not mime_type or mime_type.startswith("image"):
                 return format_html(
                     '<a class="flex items-center gap-2" href={} target="_blank"><img src="{}" style="max-width:200px; max-height:200px" /></a>'.format(
                         obj.file.url, obj.file.url
@@ -99,6 +101,7 @@ def create_dynamic_inline(inline, this_model, related_field, fk_name=None):
 
 
 """UICOPY INLINE"""
+
 
 class PageSectionInline(TabularInline):
     model = Page.sections.through
