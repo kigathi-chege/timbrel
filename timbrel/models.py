@@ -273,7 +273,7 @@ class Order(BaseModel):
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
     coupon_applied = models.BooleanField(default=False)
     products = models.ManyToManyField(
-        Product, through="payments.OrderProduct", related_name="orders"
+        Product, through="timbrel.OrderProduct", related_name="orders"
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -391,7 +391,7 @@ class Transaction(BaseModel):
     )
     transaction_type = models.CharField(choices=TRANSACTION_TYPE, default="debit")
     payment_method = models.ForeignKey(
-        "payments.PaymentMethod", on_delete=models.CASCADE
+        "timbrel.PaymentMethod", on_delete=models.CASCADE
     )
     transaction_status = models.CharField(choices=TRANSACTION_STATUS, default="pending")
     amount = models.FloatField()
@@ -618,7 +618,7 @@ class Advertisement(BaseModel):
     start_time = models.DateTimeField(help_text="When the advertisement starts")
     end_time = models.DateTimeField(help_text="When the advertisement ends")
     user = models.ForeignKey(
-        "account.User",
+        "timbrel.User",
         on_delete=models.CASCADE,
         related_name="advertisements",
         null=True,
