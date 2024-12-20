@@ -108,7 +108,7 @@ class BaseAdmin(ModelAdmin, SimpleHistoryAdmin, ImportExportModelAdmin):
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin, ModelAdmin):
+class UserAdmin(BaseUserAdmin, BaseAdmin):
     fieldsets = (
         (None, {"fields": ("phone", "password")}),
         (
@@ -143,7 +143,7 @@ admin.site.unregister(Group)
 
 
 @admin.register(Group)
-class GroupAdmin(BaseGroupAdmin, ModelAdmin):
+class GroupAdmin(BaseGroupAdmin, BaseAdmin):
     pass
 
 
@@ -151,7 +151,7 @@ class GroupAdmin(BaseGroupAdmin, ModelAdmin):
 
 
 @admin.register(Product)
-class ProductAdmin(ModelAdmin):
+class ProductAdmin(BaseAdmin):
     fields = (
         ("name", "price"),
         ("sku", "stock_level"),
@@ -173,7 +173,7 @@ class ProductAdmin(ModelAdmin):
 
 
 @admin.register(Store)
-class StoreAdmin(ModelAdmin):
+class StoreAdmin(BaseAdmin):
     fields = (
         "name",
         "phone",
@@ -190,7 +190,7 @@ class StoreAdmin(ModelAdmin):
 
 
 @admin.register(Offer)
-class OfferAdmin(ModelAdmin):
+class OfferAdmin(BaseAdmin):
     fields = (
         "name",
         "discount",
@@ -208,7 +208,7 @@ class OfferAdmin(ModelAdmin):
 
 
 @admin.register(Order)
-class OrderAdmin(ModelAdmin):
+class OrderAdmin(BaseAdmin):
     fieldsets = [
         (
             _("Order Information"),
@@ -251,7 +251,7 @@ class OrderAdmin(ModelAdmin):
 
 
 @admin.register(Transaction)
-class TransactionAdmin(ModelAdmin):
+class TransactionAdmin(BaseAdmin):
     fields = (
         "user",
         "reference",
@@ -282,7 +282,7 @@ class TransactionAdmin(ModelAdmin):
 
 
 @admin.register(Coupon)
-class CouponAdmin(ModelAdmin):
+class CouponAdmin(BaseAdmin):
     fields = [
         ("code", "discount"),
         "is_percentage",
@@ -506,7 +506,7 @@ class CityAdmin(BaseCityAdmin, BaseAdmin):
 
 
 @admin.register(Page)
-class PageAdmin(ModelAdmin):
+class PageAdmin(BaseAdmin):
     fields = ["title", "description", "url", "content", "meta_description", "keywords"]
     list_display = ("title",)
     search_fields = ("title",)
@@ -515,7 +515,7 @@ class PageAdmin(ModelAdmin):
 
 
 @admin.register(Section)
-class SectionAdmin(ModelAdmin):
+class SectionAdmin(BaseAdmin):
     fields = ["title", "description", "url"]
     list_display = ["title"]
     search_fields = ["title"]
@@ -523,19 +523,19 @@ class SectionAdmin(ModelAdmin):
 
 
 @admin.register(Text)
-class TextAdmin(ModelAdmin):
+class TextAdmin(BaseAdmin):
     fields = ["content", "link", "description", "url"]
     list_display = ("content", "link")
     search_fields = ("content", "link")
 
 
 @admin.register(Button)
-class ButtonAdmin(ModelAdmin):
+class ButtonAdmin(BaseAdmin):
     list_display = ("text", "link")
     search_fields = ("text", "link")
 
 
 @admin.register(Image)
-class ImageAdmin(ModelAdmin):
+class ImageAdmin(BaseAdmin):
     list_display = ("title", "link")
     search_fields = ("title", "link")

@@ -102,10 +102,6 @@ class CommonModel(models.Model):
 
     class Meta:
         abstract = True
-        indexes = [
-            models.Index(fields=["created_at"]),
-            models.Index(fields=["-created_at"]),
-        ]
         ordering = ["-created_at"]
 
 
@@ -117,10 +113,6 @@ class BaseModel(CommonModel):
 
     class Meta:
         abstract = True
-        indexes = [
-            models.Index(fields=["created_at"]),
-            models.Index(fields=["-created_at"]),
-        ]
         ordering = ["-created_at"]
 
 
