@@ -185,7 +185,7 @@ class ProductViewSet(BaseViewSet):
 
 
 class MpesaCallbackView(APIView):
-    permission_classes = (permissions.AllowAny(),)
+    permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
         mpesa_callback = request.data
@@ -202,9 +202,12 @@ class MpesaCallbackView(APIView):
         )
 
         if merchant_request_id:
-            transaction = Transaction.objects.filter(
-                reference=merchant_request_id
-            ).first()
+            try:
+                transaction = Transaction.objects.get(reference=merchant_request_id)
+            except Transaction.DoesNotExist:
+                raise ValueError(
+                    f"No transaction found with reference: {merchant_request_id}"
+                )
             transaction.transaction_status = "success" if result_code == 0 else "failed"
             transaction.description = json.dumps(request.data)
             transaction.save()
