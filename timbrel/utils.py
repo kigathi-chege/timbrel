@@ -40,7 +40,7 @@ def register_viewsets(router, app_name):
         pass
 
 
-def register_routers(exclude_apps = []):
+def register_routers(exclude_apps=[]):
     basic_urls = []
     included_apps = [item for item in settings.MY_APPS if item not in exclude_apps]
     for app in included_apps:
@@ -50,9 +50,9 @@ def register_routers(exclude_apps = []):
     return basic_urls
 
 
-def include_routers():
+def include_routers(exclude_apps=[]):
     """Dynamically import routers from each installed app."""
-    router_urls = register_routers()
+    router_urls = register_routers(exclude_apps)
     for app in settings.MY_APPS:
         try:
             app_urls = importlib.import_module(f"{app}.urls")
@@ -61,6 +61,7 @@ def include_routers():
         except ModuleNotFoundError:
             pass
     return router_urls
+
 
 def get_serializer_dict():
     serializer_dict = {}
