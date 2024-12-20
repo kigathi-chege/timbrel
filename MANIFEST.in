@@ -1,0 +1,2 @@
+recursive-include timbrel/static *
+recursive-include timbrel/templates *

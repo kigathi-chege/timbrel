@@ -1,0 +1,47 @@
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "timbrel"
+version = "0.1"
+dependencies = [
+    "django>=5.1.4",
+    "africastalking>=1.2.9",
+    "celery>=5.4.0",
+    "django-cities-light>=3.10.1",
+    "django-unfold>=0.43.0",
+    "djangorestframework>=3.15.2",
+    "inflect>=7.4.0",
+    "django-simple-history>=3.7.0",
+    "django-phonenumber-field>=8.0.0",
+    "django-import-export>=4.3.3",
+    "django-filter>=24.3"
+]
+description = "timbrel is a Django app to provide the basic framework for ecommerce."
+readme = "README.rst"
+requires-python = ">= 3.10"
+authors = [
+    {name = "Kigathi Chege", email = "chegekigathi@gmail.com"},
+]
+classifiers = [
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 5.1.4",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+]
+
+[project.urls]
+Homepage = "https://www.example.com/"
