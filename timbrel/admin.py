@@ -393,11 +393,11 @@ class AdvertisementAdmin(BaseAdmin):
     autocomplete_fields = ["user"]
 
 
-# @admin.register(Article)
-# class ArticleAdmin(admin.ModelAdmin):
-#     search_fields = ["title"]
-#     fields = ("title", "content")
-#     filter_horizontal = ["tags", "files", "facetvalues"]
+@admin.register(Article)
+class ArticleAdmin(BaseAdmin):
+    search_fields = ["title"]
+    fields = ("title", "content")
+    filter_horizontal = ["tags", "files", "facetvalues"]
 
 
 admin.site.unregister(Country)
