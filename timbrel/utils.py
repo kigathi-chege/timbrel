@@ -7,6 +7,7 @@ import requests
 import importlib
 from datetime import datetime
 
+from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import ForeignKey, OneToOneField, ManyToManyField
 from django.urls import path, include
@@ -52,7 +53,7 @@ def register_routers(exclude_apps=[]):
     for app in included_apps:
         router = routers.DefaultRouter()
         register_viewsets(router, app)
-        basic_urls.append(path(f"{app}/", include(router.urls)))
+        basic_urls.append(path(f"{get_route_prefix(app)}", include(router.urls)))
     return basic_urls
 
 
@@ -63,10 +64,28 @@ def include_routers(exclude_apps=[]):
         try:
             app_urls = importlib.import_module(f"{app}.urls")
             if hasattr(app_urls, "router"):
-                router_urls.append(path(f"{app}/", include(app_urls.router.urls)))
+                router_urls.append(
+                    path(f"{get_route_prefix(app)}/", include(app_urls.router.urls))
+                )
         except ModuleNotFoundError:
             pass
     return router_urls
+
+
+def get_route_prefix(app_name):
+    try:
+        app_config = apps.get_app_config(app_name)
+        if hasattr(app_config, "route_prefix"):
+            prefix = app_config.route_prefix
+        else:
+            prefix = app_name
+    except LookupError:
+        print(f"App '{app_name}' not found. Using default prefix.")
+        prefix = app_name
+    except Exception as e:
+        print(f"An error occurred while accessing the app config for '{app_name}': {e}")
+        prefix = app_name
+    return f"{prefix}/" if prefix else ""
 
 
 def get_serializer_dict():
