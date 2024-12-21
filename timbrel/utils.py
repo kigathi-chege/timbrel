@@ -8,12 +8,14 @@ import importlib
 from datetime import datetime
 
 from django.apps import apps
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import ForeignKey, OneToOneField, ManyToManyField
 from django.urls import path, include
 from django.conf import settings
 from rest_framework import viewsets, serializers, routers
-from base64 import b64encode
+
+from .settings import modules
 
 p = inflect.engine()
 
@@ -126,7 +128,7 @@ def generate_random_string(length=4, digits_only=False):
 
 
 def basic_auth(username, password):
-    token = b64encode(f"{username}:{password}".encode("utf-8")).decode("ascii")
+    token = base64.b64encode(f"{username}:{password}".encode("utf-8")).decode("ascii")
     return f"Basic {token}"
 
 
@@ -205,3 +207,36 @@ def authenticate():
 
     json_response = response.json()
     return json_response["access_token"]
+
+
+def get_model(model):
+    subclasses = model.__subclasses__()
+    if subclasses:
+        return subclasses[0]
+    else:
+        return model
+
+
+def prepare_modules(name):
+    return (f"timbrel.{module}.{name}" for module in modules)
+
+
+# Function to dynamically import all classes from the specified modules
+def import_classes(modules):
+    classes = {}
+    for module_name in modules:
+        # Dynamically import the module
+        module = importlib.import_module(module_name)
+
+        # Get all classes defined in the module
+        for name, obj in inspect.getmembers(module, inspect.isclass):
+            # Check if the class is defined in this module (not imported)
+            if obj.__module__ == module_name:
+                classes[name] = obj  # Store class by name
+    return classes
+
+
+def get_classes(name):
+    classes = import_classes(prepare_modules(name))
+    globals().update(classes)
+    return classes

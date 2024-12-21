@@ -2,7 +2,7 @@ from django.contrib.auth.backends import ModelBackend
 from phonenumber_field.phonenumber import PhoneNumber
 from phonenumbers.phonenumberutil import NumberParseException
 
-from .models import User
+from timbrel.account.models import User
 
 
 class PhoneBackend(ModelBackend):

@@ -15,7 +15,6 @@ def retrieve_permission_keys(role):
     pass
 
 
-
 def create_role(role):
     include_keys = retrieve_permission_keys(role)
     # permissions = Permission.objects.filter(codename__in=include_keys).all()

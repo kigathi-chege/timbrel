@@ -1,25 +1,6 @@
 from unfold.admin import TabularInline
 from django.utils.html import format_html
 
-from .models import Page, Section, Order
-
-
-"""PAYMENT INLINE"""
-
-
-class OrderProductsInline(TabularInline):
-    model = Order.products.through
-    tab = True
-    extra = 0
-    show_change_link = True
-    verbose_name = "product"
-    fields = ["product", "quantity", "price"]
-    autocomplete_fields = ["product"]
-    ordering = ["-created_at"]
-
-
-"""COMMON INLINE"""
-
 
 class FileInline(TabularInline):
     verbose_name = "file"
@@ -98,62 +79,3 @@ def create_dynamic_inline(inline, this_model, related_field, fk_name=None):
         DynamicInline.fk_name = fk_name
 
     return DynamicInline
-
-
-"""UICOPY INLINE"""
-
-
-class PageSectionInline(TabularInline):
-    model = Page.sections.through
-    verbose_name = "section"
-    fields = ["section", "order"]
-    autocomplete_fields = ["section"]
-    tab = True
-    extra = 0
-    show_change_link = False
-    ordering = ["order"]
-
-
-class SectionSectionInline(TabularInline):
-    model = Section.children.through
-    verbose_name = "section"
-    fields = ["parent", "child", "order"]
-    autocomplete_fields = ["parent", "child"]
-    tab = True
-    extra = 0
-    show_change_link = False
-    ordering = ["order"]
-    fk_name = "parent"
-
-
-class TextInline(TabularInline):
-    model = Section.texts.through
-    verbose_name = "text"
-    fields = ["text", "order"]
-    autocomplete_fields = ["text"]
-    tab = True
-    extra = 0
-    show_change_link = False
-    ordering = ["order"]
-
-
-class ButtonInline(TabularInline):
-    model = Section.buttons.through
-    verbose_name = "button"
-    fields = ["button", "order"]
-    autocomplete_fields = ["button"]
-    tab = True
-    extra = 0
-    show_change_link = False
-    ordering = ["order"]
-
-
-class ImageInline(TabularInline):
-    model = Section.images.through
-    verbose_name = "image"
-    fields = ["image", "order"]
-    autocomplete_fields = ["image"]
-    tab = True
-    extra = 0
-    show_change_link = False
-    ordering = ["order"]
