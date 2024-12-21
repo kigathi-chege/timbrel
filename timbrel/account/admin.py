@@ -1,9 +1,7 @@
-from typing import Any
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.models import Group
-from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from timbrel.admin import BaseAdmin
@@ -19,12 +17,13 @@ class UserAdmin(BaseUserAdmin, BaseAdmin):
             "Personal info",
             {
                 "fields": (
-                    ("username", "email"),
                     ("first_name", "last_name"),
+                    "email",
                     "description",
                     "url",
                     "newsletter",
-                )
+                ),
+                "classes": ("tab",),
             },
         ),
         (
@@ -36,11 +35,20 @@ class UserAdmin(BaseUserAdmin, BaseAdmin):
                     "is_superuser",
                     "groups",
                     "user_permissions",
-                )
+                ),
+                "classes": ("tab",),
             },
         ),
-        ("Important dates", {"fields": ("last_login", "date_joined")}),
+        (
+            "Important dates",
+            {
+                "fields": ("last_login", "date_joined"),
+                "classes": ("tab",),
+            },
+        ),
     )
+    list_display = ("name", "email", "phone", "is_staff")
+    readonly_fields = ("phone", "last_login", "date_joined")
 
 
 admin.site.unregister(Group)

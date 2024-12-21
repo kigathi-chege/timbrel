@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
+from unfold.decorators import display
 
 from timbrel.admin import BaseAdmin
 
@@ -14,8 +15,8 @@ class OrderAdmin(BaseAdmin):
             _("Order Information"),
             {
                 "fields": [
-                    "user",
-                    ("reference", "total_amount", "order_status"),
+                    "reference",
+                    ("user", "total_amount", "order_status"),
                     "description",
                 ],
                 "classes": ["tab"],
@@ -45,9 +46,29 @@ class OrderAdmin(BaseAdmin):
         ),
     ]
     readonly_fields = ["user", "reference", "total_amount"]
-    list_display = ("user", "reference", "created_at", "total_amount", "order_status")
+    list_filter = ["order_status"]
+    list_filter_submit = True
+    list_filter_sheet = False
+    list_fullwidth = True
+    list_display = ("reference", "user", "created_at", "total_amount", "display_status")
     search_fields = ["reference"]
     custom_inlines = [OrderProductsInline]
+
+    @display(
+        description=_("Status"),
+        label={
+            "pending": "info",
+            "confirmed": "primary",
+            "shipped": "warning",
+            "delivered": "success",
+            # "canceled": "danger",
+        },
+    )
+    def display_status(self, instance: Order):
+        if instance.order_status:
+            return instance.order_status
+
+        return None
 
 
 @admin.register(Transaction)
@@ -102,6 +123,14 @@ class CouponAdmin(BaseAdmin):
         "active",
     ]
     readonly_fields = ["code"]
-    list_filter = ["active", "valid_from", "valid_to"]
-    search_fields = ["code"]
-    filter_horizontal = ("tags", "files", "facetvalues")
+    list_filter = ["active", "valid_from", "valid_to", "is_percentage"]
+    search_fields = ["code", "discount"]
+
+    actions = ["deactivate_all_coupons"]
+
+    def deactivate_all_coupons(self, request, queryset):
+        """
+        Deactivate all active coupons.
+        """
+        Coupon.objects.filter(active=True).update(active=False)
+        self.message_user(request, "All active coupons have been deactivated.")

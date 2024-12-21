@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.views import APIView
 
 from .filters import OrderFilter
-from .models import Order, Transaction, PaymentMethod, Coupon
+from .models import Customer, Order, Transaction, PaymentMethod, Coupon
 from timbrel.tasks import calculate_popular_products
 
 from timbrel.permissions import IsOwnerOnly
@@ -17,6 +17,7 @@ from .serializers import (
     OrderSerializer,
     TransactionSerializer,
     PaymentMethodSerializer,
+    CustomerSerializer,
     CouponSerializer,
 )
 
@@ -54,9 +55,25 @@ class MpesaCallbackView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
+class CustomerViewSet(BaseViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return Customer.objects.all()
+
+        return Customer.objects.filter(user=self.request.user)
+
+
 class CouponViewSet(BaseViewSet):
     queryset = Coupon.objects.all()
     serializer_class = CouponSerializer
+
+    @action(detail=False, methods=["get"])
+    def toggle(self, request):
+        return Response(Coupon.toggle_all_coupons(), status=status.HTTP_200_OK)
 
 
 class OrderViewSet(BaseViewSet):
@@ -70,20 +87,10 @@ class OrderViewSet(BaseViewSet):
         """
         Override to allow different permissions for register vs other actions.
         """
-        if self.action == "pay":
+        if self.action == "pay" or self.action == "create":
             return [permissions.AllowAny()]
         else:
             return super().get_permissions()
-
-    def create(self, request, *args, **kwargs):
-        print("CREATINMG")
-        serializer = self.get_serializer(data=request.data, required=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
 
     @action(detail=True, methods=["post"])
     def cart(self, request, pk=None):

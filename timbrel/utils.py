@@ -209,12 +209,12 @@ def authenticate():
     return json_response["access_token"]
 
 
-def get_model(model):
-    subclasses = model.__subclasses__()
+def get_class(_class):
+    subclasses = _class.__subclasses__()
     if subclasses:
         return subclasses[0]
     else:
-        return model
+        return _class
 
 
 def prepare_modules(name):
@@ -240,3 +240,16 @@ def get_classes(name):
     classes = import_classes(prepare_modules(name))
     globals().update(classes)
     return classes
+
+
+def only(request, *args):
+    return dict(filter(lambda item: item[0] in args, request.items()))
+
+
+def only_pop(request, *args):
+    selected_data = {key: request[key] for key in args if key in request}
+
+    for key in selected_data:
+        request.pop(key, None)
+
+    return selected_data

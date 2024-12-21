@@ -6,7 +6,6 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.conf import settings
 
-
 from timbrel.utils import generate_random_string
 from timbrel.base import BaseModel
 

@@ -13,7 +13,7 @@ from phonenumber_field.phonenumber import PhoneNumber
 
 from timbrel.tasks import send_sms
 from timbrel.base import BaseSerializer
-from timbrel.utils import generate_random_string, get_model
+from timbrel.utils import generate_random_string, get_class
 from .models import User, OTP
 
 
@@ -36,6 +36,8 @@ class TokenObtainPairSerializer(TokenObtainSerializer):
 
 
 class UserSerializer(BaseSerializer):
+    password = serializers.CharField(required=False)
+    region = serializers.CharField(required=False)
     username = serializers.CharField(required=False)
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
@@ -44,6 +46,9 @@ class UserSerializer(BaseSerializer):
     def create(self, validated_data):
         validated_data["username"] = self.retrieve_username(validated_data)
         user = super().create(validated_data)
+        if "password" not in validated_data or validated_data["password"] is None:
+            validated_data["password"] = generate_random_string()
+            # TODO: Kigathi - December 21 2024 - Should send notification email if password is generated
         user.set_password(validated_data["password"])
         user.save()
         return user
@@ -75,8 +80,14 @@ class UserSerializer(BaseSerializer):
             raise serializers.ValidationError("Phone number is invalid")
         phone = phone.as_e164.strip("+")
         if User.objects.filter(phone=phone).exists():
-            raise serializers.ValidationError("Phone number already registered")
+            raise serializers.ValidationError("Phone number already registered", phone)
         return phone
+
+    def validate_email(self, email):
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("Email already registered.")
+
+        return email
 
     def retrieve_username(self, validated_data):
         if ("username" in validated_data) and validated_data["username"]:
@@ -101,6 +112,26 @@ class UserSerializer(BaseSerializer):
             username = f"{base_username}{random_suffix}"
 
         return username
+
+    @classmethod
+    def get_user(cls, data):
+        serializer = cls(data=data)
+
+        if serializer.is_valid():
+            user = serializer.save()
+        else:
+            # TODO: Kigathi - December 21 2024 - Note that if the error message changes, this code will fail
+            if (
+                "phone" in serializer.errors
+                and serializer.errors["phone"][0] == "Phone number already registered"
+            ):
+                user = get_class(User).objects.get(
+                    phone=serializer.errors["phone"][0].code
+                )
+            else:
+                raise ValidationError(serializer.errors)
+
+        return user
 
     class Meta:
         model = User

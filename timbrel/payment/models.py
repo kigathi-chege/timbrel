@@ -1,22 +1,107 @@
 import uuid
 import datetime
 
+from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.utils import timezone
 from phonenumber_field.phonenumber import PhoneNumber
 
-from timbrel.utils import mpesa_express, generate_random_string
 from timbrel.base import BaseModel
-
 from timbrel.account.models import User
 from timbrel.inventory.models import Store, Product, StoreProduct
+from timbrel.utils import mpesa_express, generate_random_string
+from timbrel.gmaps import retrieve
 
 
 class Customer(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    BILLING_CYCLES = (
+        ("daily", "Daily"),
+        ("weekly", "Weekly"),
+        ("monthly", "Monthly"),
+        ("quarterly", "Quarterly"),
+        ("semi_annually", "Semi Annually"),
+        ("annually", "Annually"),
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="customerprofiles"
+    )
     address = models.CharField(max_length=100, null=True, blank=True)
     latitude = models.CharField(max_length=100, null=True, blank=True)
     longitude = models.CharField(max_length=100, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_primary = models.BooleanField(default=False)
+    address_line_1 = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        db_comment="The main address line (house/building number, street name).",
+    )
+    address_line_2 = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        db_comment="Optional field for additional address details (e.g., apartment number, suite, floor).",
+    )
+    city = models.ForeignKey("cities_light.City", on_delete=models.SET_NULL, null=True)
+    subregion = models.ForeignKey(
+        "cities_light.SubRegion", on_delete=models.SET_NULL, null=True
+    )
+    postal_code = models.CharField(max_length=100, null=True, blank=True)
+    phone = models.CharField(max_length=100, null=True, blank=True)
+    delivery_instructions = models.TextField(null=True, blank=True)
+    company_name = models.CharField(max_length=100, null=True, blank=True)
+    vat_number = models.CharField(max_length=100, null=True, blank=True)
+    billing_cycle = models.CharField(
+        max_length=100, choices=BILLING_CYCLES, null=True, blank=True
+    )
+    payment_method = models.ForeignKey(
+        "timbrel.PaymentMethod", on_delete=models.CASCADE, null=True, blank=True
+    )
+
+    def clean(self):
+        if self.is_primary:
+            if (
+                Customer.objects.filter(user=self.user, is_primary=True)
+                .exclude(id=self.id)
+                .exists()
+            ):
+                raise ValidationError(
+                    "A customer can only have one primary profile at a time."
+                )
+
+    def save(self, *args, **kwargs):
+        if self.is_primary:
+            Customer.objects.filter(user=self.user, is_primary=True).exclude(
+                id=self.id
+            ).update(is_primary=False)
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_profile(cls, user, address, payment_method=None):
+        customer_profile = cls.objects.filter(address=address).first()
+
+        if not customer_profile:
+            (
+                delivery_address,
+                latitude,
+                longitude,
+            ) = retrieve(address)
+
+            customer_profile, _ = cls.objects.get_or_create(
+                user=user,
+                address=delivery_address,
+                latitude=latitude,
+                longitude=longitude,
+                payment_method=payment_method,
+                defaults={
+                    "is_primary": True,
+                },
+            )
+
+        if not customer_profile.is_primary:
+            customer_profile.is_primary = True
+            customer_profile.save()
+        return customer_profile
 
     def __str__(self):
         return self.user.name
@@ -50,6 +135,12 @@ class Coupon(BaseModel):
         if self.is_percentage:
             return total_amount - (total_amount * (self.discount / 100))
         return max(0, total_amount - self.discount)
+
+    @classmethod
+    def toggle_all_coupons(on=True):
+        coupons = Coupon.objects.filter(active=True)
+        print("COUPONS", coupons)
+        return f"All active coupons have been {'' if on else 'de'}activated."
 
     def __str__(self):
         return self.code
